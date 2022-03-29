@@ -1,6 +1,9 @@
+
+
 ### Notes
 The following notes about Laravel are about using Laravel as an API backend.  
-The notes here may also not be 100% accurate.
+The notes here may also not be 100% accurate.  
+Adapted from [Laravel Docs](https://laravel.com/docs/9.x) and personal usage.
 
 ## Getting Started
 1. Create Laravel Project: `composer create-project laravel/laravel project_name`
@@ -10,8 +13,8 @@ The notes here may also not be 100% accurate.
 - [Models](#models)
 - [Controllers](#controllers)
 - [Migrations](#migrations)
-- Middlewares *To be written*
-- Routing *To be written*
+- [Middlewares](#middlewares)
+- [Routing](#routing)
 - Factories *To be written*
 - Seeders *To be written*
 - [Eloquent Operations](#eloquent-operations)
@@ -24,22 +27,33 @@ Creation: `php artisan make:model ModelName`
 - `-m` *creates corresponding migration file at database/migrations/*
 - `-f` *creates corresponding factory at database/factories/ModelFactory.php*
 - `-s` *creates corresponding seeder at database/seeders/ModelSeeder.php*
-- `-c` *creates corresponding controller at app/Http/Controllers/ModelsController.php*
+- `-c` *creates corresponding controller at app/Http/Controllers/ModelController.php*
 
 Importing: `use App\Models\ModelName;`
 
-By default *primary key* is ModelName in snake_case.  
+By default *primary key* is ModelName in snake_case  
 To change, specify `protected $primaryKey = 'model_id';` in the model file
+
+By default *primary key* is assumed to be *auto incrementing*  
+To change, specify `public $incrementing = false;` in the model file
 
 By default *timestamps* fields are enabled (*created_at*, *updated_at*)  
 To disable, specify `public $timestamps = false;` in the model file
 
-### Controllers
-Creation: `php artisan make:controller ModelsController`  
-*- creates app/Http/Controllers/ModelsController.php*  
-Convention is to name the controllers as ModelName(plural)Controller
+#### Relationships
+Relationships between models are defined by methods within `Model` class
+- has One `public function relatedModel() { return $this->hasOne(RelatedModel::class); }`
+- belongs to One `public function relatedModel() { return $this->belongsTo(RelatedModel::class); }`
+- has Many `public function relatedModels() { return $this->hasMany(RelatedModel::class); }`
+If primary key on the related model table is not `id`, specify as second argument, e.g. `related_model_id`  
+With relationships, `$model->relatedModel` and `$model->relatedModels()` can be accessed.
 
-Importing: `use App\Http\Controllers\ModelsController;`
+### Controllers
+Creation: `php artisan make:controller ModelController`  
+*- creates app/Http/Controllers/ModelController.php*  
+Convention is to name the controllers as ModelNameController
+
+Importing: `use App\Http\Controllers\ModelController;`
 
 #### Flags
 - `--resource` *creates `index`, `create`, `store`, `show`, `edit`, `update`, `destroy` methods*
@@ -166,6 +180,46 @@ Primary key: `$table->primary(field_name);`
 		<td>Assign current timestamp</td>
 	</tr>
 </table>
+
+### Middlewares
+Creation: `php artisan make:middleware middleware_name`  
+*- creates app/Http/Middleware/middleware_name.php*
+
+Access request header: `$request->header('header_name');`  
+Add attribute to request: `$request->attributes->add(['attribute_name' => $value]);`  
+Access request attribute: `$request->get('attribute_name');`
+
+#### Registering Route Middleware
+Edit `app/Http/Kernal.php`  
+Find `$routeMiddleware`  
+Add `'middleware_prefix' => \App\Http\Middleware\middleware_name::class` (middleware_prefix will be used as a reference when assigning to route)
+
+### Routing
+Edit routes at `routes/api.php`  
+Note: api routes are served at `website.com/api/` by default
+
+#### HTTP Routes
+Generic: `Route::http_type('path', reference_to_handler)`  
+`'path'` can have variables by inserting `{var_name}` and accessing `$var_name` within the handler for the route.  
+`reference_to_handler` can be:
+- `'ModelController@handler_name'` (must be namespaced or imported)
+- `[ModelController::class, 'handler_name']`  (must be imported)
+
+(Fill ... with generic definition of the arguments on top)
+GET: `Route::get(...);`
+POST: `Route::post(...);`
+PUT: `Route::put(...);`
+DELETE: `Route::delete(...)`
+
+API methods: `Route::apiResource('prefix', Model::class);` (auto assigns `index`, `show`, `update`, `destroy` correspondingly)
+
+#### Modified Routes
+Namespaced Routes: `Route::namespace('namespace');` / `->namespace(...);`  
+Prefixed Routes: `Route::prefix('prefix');` / `->prefix('prefix');`  
+Middleware Routes: `Route::middleware('middleware_prefix');` / `->middleware(...);`  
+Multiple Middleware (executes in given order): `Route::middleware(['prefix1', 'prefix2']);` / `->middleware([...]);`  
+Grouped Routes: `->group(function() { // routes });`
+Regex Variable Routes: `->where('var_name', 'regex');`
 
 ### Eloquent Operations
 <table>
