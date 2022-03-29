@@ -45,6 +45,7 @@ Relationships between models are defined by methods within `Model` class
 - has One `public function relatedModel() { return $this->hasOne(RelatedModel::class); }`
 - belongs to One `public function relatedModel() { return $this->belongsTo(RelatedModel::class); }`
 - has Many `public function relatedModels() { return $this->hasMany(RelatedModel::class); }`
+
 If primary key on the related model table is not `id`, specify as second argument, e.g. `related_model_id`  
 With relationships, `$model->relatedModel` and `$model->relatedModels()` can be accessed.
 
@@ -205,12 +206,11 @@ Generic: `Route::http_type('path', reference_to_handler)`
 - `'ModelController@handler_name'` (must be namespaced or imported)
 - `[ModelController::class, 'handler_name']`  (must be imported)
 
-(Fill ... with generic definition of the arguments on top)
-GET: `Route::get(...);`
-POST: `Route::post(...);`
-PUT: `Route::put(...);`
-DELETE: `Route::delete(...)`
-
+(Fill ... with generic definition of the arguments on top)  
+GET: `Route::get(...);`  
+POST: `Route::post(...);`  
+PUT: `Route::put(...);`  
+DELETE: `Route::delete(...)`  
 API methods: `Route::apiResource('prefix', Model::class);` (auto assigns `index`, `show`, `update`, `destroy` correspondingly)
 
 #### Modified Routes
