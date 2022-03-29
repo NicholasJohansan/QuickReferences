@@ -3,7 +3,7 @@
 ### Notes
 The following notes about Laravel are about using Laravel as an API backend.  
 The notes here may also not be 100% accurate.  
-Adapted from [Laravel Docs](https://laravel.com/docs/9.x) and personal usage.
+Adapted from [Laravel Docs](https://laravel.com/docs/9.x), [PHP Faker](https://github.com/fzaninotto/Faker) and personal usage.
 
 ## Getting Started
 1. Create Laravel Project: `composer create-project laravel/laravel project_name`
@@ -15,8 +15,8 @@ Adapted from [Laravel Docs](https://laravel.com/docs/9.x) and personal usage.
 - [Migrations](#migrations)
 - [Middlewares](#middlewares)
 - [Routing](#routing)
-- Factories *To be written*
-- Seeders *To be written*
+- [Factories](#factories)
+- [Seeders](#seeders)
 - [Eloquent Operations](#eloquent-operations)
 
 ### Models
@@ -65,7 +65,13 @@ Importing: `use App\Http\Controllers\ModelController;`
 Creation: `php artisan make:migration migration_name`  
 *- creates database/migrations/timestamp_migration_name.php*
 
-#### Operations:  
+Run: `php artisan migrate`  
+Fresh Migration: `php artisan migrate:fresh` (drop everything and form the database again)
+
+#### Flags
+- `--seed` *runs with seeder*
+
+#### Operations  
 Create Table: `Schema::create('models', function (Blueprint $table) {});`  
 Drop Table: `Schema::dropIfExists('models');`  
 Update Table: `Schema::table('models, function (Blueprint $table) {});`  
@@ -220,6 +226,100 @@ Middleware Routes: `Route::middleware('middleware_prefix');` / `->middleware(...
 Multiple Middleware (executes in given order): `Route::middleware(['prefix1', 'prefix2']);` / `->middleware([...]);`  
 Grouped Routes: `->group(function() { // routes });`
 Regex Variable Routes: `->where('var_name', 'regex');`
+
+### Factories
+Creation: `php artisan make:factory ModelFactory`  
+*- creates database/factories/ModelFactory.php*
+
+Edit `public function definition()` return value to a keyed array with the columns of the Model.  
+e.g. `return ['field1' => 'value1', 'field2' => 'value2'];`  
+For foreign keys, a random valid key can be selected by using `ForeignModel::(insert query)->inRandomOrder()->first()->id_name_on_foreign_table`  
+Values used can also be values from faker by using `$this->faker->value_func()`. *refer below*
+
+#### Faker Values
+<table>
+	<tr>
+		<th>Function</th>
+		<th>Notes</th>
+	</tr>
+	<tr>
+		<td><pre lang="php">name()</pre></td>
+		<td>e.g. Dr. Zane Stroman</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">userName()</pre></td>
+		<td>e.g. wade55</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">safeEmail()</pre></td>
+		<td>e.g. king.alford@example.org</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">password()</pre></td>
+		<td>e.g. k&|X+a45*2[</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">phoneNumber()</pre></td>
+		<td>e.g. 201-886-0269</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">address()</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">word()</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">sentence($noOfWords=6, $variableNoWords=true)</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">text($maxNoOfCharacters=200)</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">randomElement($array)</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">randomDigitNotNull()</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">randomNumber($noOfDigits, $strict)</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">randomFloat($maxNoOfDigits, $min, $max)</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">numberBetween($min, $max)</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">date($format='Y-m-d', $max='now')</pre></td>
+		<td>e.g. 1979-06-09</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">time($format='H:i:s', $max='now')</pre></td>
+		<td>e.g. 20:49:42</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">dateTime($max='now', $timezone)</pre></td>
+		<td>e.g. DateTime('2008-04-25 08:37:17', 'UTC')</td>
+	</tr>
+	<tr>
+		<td><pre lang="php">company()</pre></td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+
+### Seeders
+Edit `database/seeders/DatabaseSeeder.php`  
+Add data: `Model::factory($count)->create()`  
+Run: `php artisan db:seed`
 
 ### Eloquent Operations
 <table>
